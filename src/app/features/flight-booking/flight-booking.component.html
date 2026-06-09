@@ -214,6 +214,45 @@
               </div>
             }
 
+            <!-- API Error Banner -->
+            @if (bookingError()) {
+              <div class="rounded-2xl border border-rose-200 bg-rose-50 p-4 animate-fadeIn" role="alert">
+                <div class="flex items-start gap-3">
+                  <!-- Icon -->
+                  <div class="mt-0.5 flex-shrink-0 w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 text-rose-600">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <!-- Content -->
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-bold text-rose-800">{{ bookingError()!.message }}</p>
+                    @if (bookingError()!.errors.length > 0) {
+                      <ul class="mt-2 space-y-1">
+                        @for (err of bookingError()!.errors; track $index) {
+                          <li class="text-xs text-rose-700 flex items-center gap-1.5">
+                            <span class="w-1 h-1 rounded-full bg-rose-400 flex-shrink-0 inline-block"></span>
+                            {{ err }}
+                          </li>
+                        }
+                      </ul>
+                    }
+                  </div>
+                  <!-- Dismiss -->
+                  <button
+                    type="button"
+                    (click)="bookingError.set(null)"
+                    class="flex-shrink-0 text-rose-400 hover:text-rose-600 transition-colors duration-150"
+                    aria-label="Dismiss error"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+                      <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            }
+
             <!-- Confirm Booking Submission Action -->
             <div class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
               <a 

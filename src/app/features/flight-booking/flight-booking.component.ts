@@ -59,6 +59,7 @@ export class FlightBookingComponent implements OnInit {
   });
   protected readonly totalPrice = signal(0);
   protected readonly bookingReference = signal<string | null>(null);
+  protected readonly bookingError = signal<{ message: string; errors: string[] } | null>(null);
 
   // Form State Writable Signal
   protected readonly bookingModel = signal<BookingModel>({
@@ -169,14 +170,19 @@ export class FlightBookingComponent implements OnInit {
         }))
       };
 
+      this.bookingError.set(null);
       try {
         const response = await firstValueFrom(this.bookingService.bookFlight(payload));
         if (response?.data?.bookingReference) {
           this.bookingReference.set(response.data.bookingReference);
           this.bookingService.bookingReference.set(response.data.bookingReference);
         }
-      } catch (err) {
-        console.error('Booking failed', err);
+      } catch (err: any) {
+        const body = err?.error;
+        this.bookingError.set({
+          message: body?.message ?? 'An unexpected error occurred. Please try again.',
+          errors: Array.isArray(body?.errors) ? body.errors : []
+        });
       }
     });
   }
