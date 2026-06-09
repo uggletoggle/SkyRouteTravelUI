@@ -16,7 +16,7 @@ export class ApiHealthService {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 5000);
 
-      const response = await fetch(`${this.baseUrl}/api/providers`, {
+      const response = await fetch(`${this.baseUrl}/providers`, {
         method: 'GET',
         signal: controller.signal,
       });
