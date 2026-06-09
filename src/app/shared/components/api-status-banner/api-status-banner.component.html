@@ -1,0 +1,14 @@
+@if (isVisible()) {
+  <div class="api-banner" [ngClass]="config().cls" role="alert" aria-live="assertive">
+    <div class="api-banner__inner">
+      <span class="api-banner__icon" aria-hidden="true">{{ config().icon }}</span>
+      <div class="api-banner__text">
+        <strong class="api-banner__title">{{ config().message }}</strong>
+        <span class="api-banner__detail">{{ config().detail }}</span>
+      </div>
+      @if (status() === 'checking') {
+        <span class="api-banner__spinner" aria-hidden="true"></span>
+      }
+    </div>
+  </div>
+}
