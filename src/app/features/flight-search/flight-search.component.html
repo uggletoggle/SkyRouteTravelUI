@@ -1,0 +1,297 @@
+<!-- App Header -->
+<app-header></app-header>
+
+<!-- Main Container -->
+<main class="min-h-[calc(100vh-5rem)] bg-gradient-to-b from-sky-50/50 via-slate-50 to-white text-slate-800 flex flex-col items-center justify-start py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+  
+  <!-- Decorative Background Elements (Light Cloud/Sky Effect) -->
+  <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-100/30 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+  <div class="absolute bottom-10 right-1/4 w-[400px] h-[400px] bg-sky-100/40 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+
+  <!-- Content Wrapper -->
+  <div class="w-full max-w-4xl z-10 flex flex-col items-center">
+    
+    <!-- Title / Headline Section (Matches Screen 1 of reference image) -->
+    <div class="text-center mb-10 max-w-2xl animate-scaleUp">
+      <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900 mb-3 leading-tight">
+        The World Is Just One Flight Away
+      </h1>
+      <p class="text-sm sm:text-base text-slate-500 font-medium">
+        Find flights. Book fast. Fly easy.
+      </p>
+    </div>
+
+    <!-- Flight Search Card (Minimalist Light Theme) -->
+    <div class="w-full bg-white border border-slate-100 rounded-[2rem] shadow-xl shadow-slate-200/50 p-6 sm:p-10 relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-slate-200/60">
+      
+      <!-- Glassmorphic Loading Overlay (2 seconds search delay) -->
+      @if (isSearching()) {
+        <div class="absolute inset-0 bg-white/80 backdrop-blur-md z-30 flex flex-col items-center justify-center animate-fadeIn">
+          <div class="flex flex-col items-center space-y-5">
+            <!-- Animated Custom Spinner -->
+            <div class="relative w-16 h-16 flex items-center justify-center">
+              <div class="absolute inset-0 rounded-full border-4 border-slate-100/80"></div>
+              <div class="absolute inset-0 rounded-full border-4 border-t-blue-600 border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
+              <!-- Mini Plane Icon in Center -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-blue-600 transform -rotate-45">
+                <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.977a.75.75 0 0 0 .29.377L12 15.75h-1.5a.75.75 0 0 0-.75.75v3a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 .75-.75v-3a.75.75 0 0 0-.25-.561l-4.5-4.5a.75.75 0 0 0-.378-.29L3.478 2.404Z" />
+                <path d="M20.522 2.404a.75.75 0 0 1 .926.941l-2.432 7.977a.75.75 0 0 1-.29.377L12 15.75h1.5a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-2.25H9a.75.75 0 0 1-.75-.75v-3a.75.75 0 0 1 .25-.561l4.5-4.5c.105-.105.234-.187.378-.29l7.144-5.045Z" />
+              </svg>
+            </div>
+            <div class="text-center">
+              <p class="text-lg font-bold text-slate-800">Searching Flights</p>
+              <p class="text-sm text-slate-500 mt-1">Comparing best rates and routings...</p>
+            </div>
+          </div>
+        </div>
+      }
+
+      <form (submit)="onSearch($event)" class="space-y-8" novalidate>
+        
+        <!-- Input Fields Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          <!-- From Airport Dropdown -->
+          <div class="flex flex-col space-y-2">
+            <label for="from" class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center justify-between">
+              <span>From</span>
+              <span class="text-[10px] text-blue-600 font-bold">Origin</span>
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                </svg>
+              </div>
+              <select
+                id="from"
+                [formField]="searchForm.from"
+                class="w-full pl-10 pr-10 py-3 bg-slate-50 border rounded-xl text-slate-800 focus:outline-none focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all duration-200 appearance-none cursor-pointer"
+                [ngClass]="{
+                  'border-rose-500/80 focus:ring-rose-500/10 focus:border-rose-500': searchForm.from().invalid() && searchForm.from().touched(),
+                  'border-slate-100 hover:border-slate-200': !(searchForm.from().invalid() && searchForm.from().touched())
+                }"
+              >
+                <option value="" disabled selected>Select origin airport...</option>
+                @for (airport of airports(); track airport.code) {
+                  <option [value]="airport.code">
+                    {{ airport.city }} ({{ airport.code }}) - {{ airport.name }}
+                  </option>
+                }
+              </select>
+              <!-- Dropdown Chevron -->
+              <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                </svg>
+              </div>
+            </div>
+            <!-- Validation Errors -->
+            @if (searchForm.from().invalid() && searchForm.from().touched()) {
+              <div class="text-xs text-rose-500 flex items-center space-x-1.5 mt-1 animate-fadeIn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5 flex-shrink-0">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                </svg>
+                <span>{{ searchForm.from().errors()[0]?.message }}</span>
+              </div>
+            }
+          </div>
+
+          <!-- To Airport Dropdown -->
+          <div class="flex flex-col space-y-2">
+            <label for="to" class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center justify-between">
+              <span>To</span>
+              <span class="text-[10px] text-blue-600 font-bold">Destination</span>
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                </svg>
+              </div>
+              <select
+                id="to"
+                [formField]="searchForm.to"
+                class="w-full pl-10 pr-10 py-3 bg-slate-50 border rounded-xl text-slate-800 focus:outline-none focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all duration-200 appearance-none cursor-pointer"
+                [ngClass]="{
+                  'border-rose-500/80 focus:ring-rose-500/10 focus:border-rose-500': searchForm.to().invalid() && searchForm.to().touched(),
+                  'border-slate-100 hover:border-slate-200': !(searchForm.to().invalid() && searchForm.to().touched())
+                }"
+              >
+                <option value="" disabled selected>Select destination airport...</option>
+                @for (airport of airports(); track airport.code) {
+                  <option [value]="airport.code">
+                    {{ airport.city }} ({{ airport.code }}) - {{ airport.name }}
+                  </option>
+                }
+              </select>
+              <!-- Dropdown Chevron -->
+              <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                </svg>
+              </div>
+            </div>
+            <!-- Validation Errors -->
+            @if (searchForm.to().invalid() && searchForm.to().touched()) {
+              <div class="text-xs text-rose-500 flex items-center space-x-1.5 mt-1 animate-fadeIn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5 flex-shrink-0">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                </svg>
+                <span>{{ searchForm.to().errors()[0]?.message }}</span>
+              </div>
+            }
+          </div>
+
+          <!-- Departure Date Field -->
+          <div class="flex flex-col space-y-2">
+            <label for="departureDate" class="text-xs font-bold uppercase tracking-wider text-slate-500">Departure Date</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                </svg>
+              </div>
+              <input
+                id="departureDate"
+                type="date"
+                [formField]="searchForm.departureDate"
+                class="w-full pl-10 pr-4 py-3 bg-slate-50 border rounded-xl text-slate-800 focus:outline-none focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all duration-200"
+                [ngClass]="{
+                  'border-rose-500/80 focus:ring-rose-500/10 focus:border-rose-500': searchForm.departureDate().invalid() && searchForm.departureDate().touched(),
+                  'border-slate-100 hover:border-slate-200': !(searchForm.departureDate().invalid() && searchForm.departureDate().touched())
+                }"
+              />
+            </div>
+            <!-- Validation Errors -->
+            @if (searchForm.departureDate().invalid() && searchForm.departureDate().touched()) {
+              <div class="text-xs text-rose-500 flex items-center space-x-1.5 mt-1 animate-fadeIn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5 flex-shrink-0">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                </svg>
+                <span>{{ searchForm.departureDate().errors()[0]?.message }}</span>
+              </div>
+            }
+          </div>
+
+        </div>
+
+        <!-- Second Row of Input Fields -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- No of Passengers Field (Value restricted 1 to 9) -->
+          <div class="flex flex-col space-y-2">
+            <label for="passengers" class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center justify-between">
+              <span>No. of Passengers</span>
+              <span class="text-[10px] text-slate-400 font-normal">Range: 1 - 9</span>
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                </svg>
+              </div>
+              <input
+                id="passengers"
+                type="number"
+                placeholder="Number of passengers"
+                [formField]="searchForm.passengers"
+                class="w-full pl-10 pr-4 py-3 bg-slate-50 border rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all duration-200"
+                [ngClass]="{
+                  'border-rose-500/80 focus:ring-rose-500/10 focus:border-rose-500': searchForm.passengers().invalid() && searchForm.passengers().touched(),
+                  'border-slate-100 hover:border-slate-200': !(searchForm.passengers().invalid() && searchForm.passengers().touched())
+                }"
+              />
+            </div>
+            <!-- Validation Errors -->
+            @if (searchForm.passengers().invalid() && searchForm.passengers().touched()) {
+              <div class="text-xs text-rose-500 flex items-center space-x-1.5 mt-1 animate-fadeIn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5 flex-shrink-0">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                </svg>
+                <span>{{ searchForm.passengers().errors()[0]?.message }}</span>
+              </div>
+            }
+          </div>
+
+          <!-- Flight Class/Type Field -->
+          <div class="flex flex-col space-y-2">
+            <label for="flightType" class="text-xs font-bold uppercase tracking-wider text-slate-500">Flight Class</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+              </div>
+              <select
+                id="flightType"
+                [formField]="searchForm.flightType"
+                class="w-full pl-10 pr-10 py-3 bg-slate-50 border rounded-xl text-slate-800 focus:outline-none focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all duration-200 appearance-none cursor-pointer"
+                [ngClass]="{
+                  'border-rose-500/80 focus:ring-rose-500/10 focus:border-rose-500': searchForm.flightType().invalid() && searchForm.flightType().touched(),
+                  'border-slate-100 hover:border-slate-200': !(searchForm.flightType().invalid() && searchForm.flightType().touched())
+                }"
+              >
+                <option value="All">All Classes</option>
+                <option value="Economy">Economy</option>
+                <option value="Business">Business</option>
+                <option value="First Class">First Class</option>
+              </select>
+              <!-- Dropdown Chevron -->
+              <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                </svg>
+              </div>
+            </div>
+            <!-- Validation Errors -->
+            @if (searchForm.flightType().invalid() && searchForm.flightType().touched()) {
+              <div class="text-xs text-rose-500 flex items-center space-x-1.5 mt-1 animate-fadeIn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5 flex-shrink-0">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                </svg>
+                <span>{{ searchForm.flightType().errors()[0]?.message }}</span>
+              </div>
+            }
+          </div>
+
+        </div>
+
+        <!-- Action Buttons (Matches Screen 1 "Book Flight" design from reference) -->
+        <div class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+          
+          <button 
+            type="button" 
+            (click)="resetForm()"
+            class="w-full sm:w-auto px-6 py-3 border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-600 rounded-xl text-sm font-semibold transition-all duration-300 active:scale-98 cursor-pointer"
+          >
+            Clear Fields
+          </button>
+
+          <button
+            type="submit"
+            [disabled]="isSearching()"
+            class="w-full sm:w-auto min-w-[200px] bg-blue-600 hover:bg-blue-500 text-white font-bold text-base px-8 py-3.5 rounded-xl shadow-lg shadow-blue-500/20 transition-all duration-300 active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-3 cursor-pointer"
+          >
+            @if (isSearching()) {
+              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span>Searching...</span>
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+              <span>Search Flights</span>
+            }
+          </button>
+
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</main>
